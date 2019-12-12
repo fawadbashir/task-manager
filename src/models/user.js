@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique : true,
+        unique: true,
         trim: true,
         lowercase: true,
         validate(value) {
@@ -41,20 +41,26 @@ const userSchema = new mongoose.Schema({
             }
         }
     },
-    tokens : [{
-        token : {
+    tokens: [{
+        token: {
             type: String,
-            required : true
+            required: true
         }
     }]
 })
 
+userSchema.virtual('tasks', {
+    ref: 'Task',
+    localField: '_id',
+    foreignField: 'owner'
+})
 
-userSchema.methods.generateAuthToken = async function() {
+
+userSchema.methods.generateAuthToken = async function () {
     const user = this
-    const token = jwt.sign({id : user._id.toString()}, 'secret')
+    const token = jwt.sign({ _id: user._id.toString() }, 'secret')
 
-    user.tokens = user.tokens.concat({token})
+    user.tokens = user.tokens.concat({ token })
     await user.save()
 
     return token
@@ -62,28 +68,38 @@ userSchema.methods.generateAuthToken = async function() {
 
 
 userSchema.statics.findByCredentials = async (email, password) => {
-    const user = await User.findOne({email})
+    const user = await User.findOne({ email })
 
-    if(!user) {
-        throw new Error ('Unable to Login')
+    if (!user) {
+        throw new Error('Unable to Login')
     }
     const isMatch = await bcrypt.compare(password, user.password)
 
-    if(!isMatch) {
+    if (!isMatch) {
         throw new Error('Unable to Login')
-    } 
+    }
     return user
 }
 
-userSchema.pre('save', async function(next) {
+userSchema.methods.toJSON = function () {
     const user = this
-    
+    const userObject = user.toObject()
+
+    delete userObject.password
+    delete userObject.tokens
+
+    return userObject
+}
+
+userSchema.pre('save', async function (next) {
+    const user = this
+
     if (user.isModified('password')) {
         user.password = await bcrypt.hash(user.password, 8)
     }
     next()
 })
 
-const User = mongoose.model('User', userSchema )
+const User = mongoose.model('User', userSchema)
 
 module.exports = User

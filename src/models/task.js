@@ -2,20 +2,26 @@ const mongoose = require('mongoose')
 const validator = require('validator')
 
 const Task = mongoose.model('Task', {
-    description : {
-        type : String,
-        trim : true,
-        required : true
+    description: {
+        type: String,
+        trim: true,
+        required: true
     },
-    completed : {
-        type : Boolean,
-        default : false
+    completed: {
+        type: Boolean,
+        default: false
+    },
+    owner: {
+        type: mongoose.Schema.Types.ObjectId,
+        require: true,
+        ref: 'User'
     }
+
 })
 
 const newTask = new Task({
-    description : "Clean Dishes",
-    completed : false
+    description: "Clean Dishes",
+    completed: false
 })
 
 module.exports = Task
