@@ -1,5 +1,5 @@
 const express = require('express')
-const mongoose = require('mongoose')
+
 require('./db/mongoose')
 const userRoute = require('./routes/user')
 const taskRoute = require('./routes/task')
@@ -10,10 +10,10 @@ const port = process.env.port || 5000
 
 
 
-app.use(express.json()) 
-    
-    app.use(userRoute)
-    app.use(taskRoute)
+app.use(express.json())
+
+app.use(userRoute)
+app.use(taskRoute)
 
 // app.get('/users',(req,res) => {
 //     User.find({}).then((users) => {
