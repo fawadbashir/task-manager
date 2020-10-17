@@ -1,12 +1,15 @@
 const express = require('express')
 
+
+
 require('./db/mongoose')
 const userRoute = require('./routes/user')
 const taskRoute = require('./routes/task')
 
+
 const app = express()
 
-const port = process.env.port || 5000
+const port = process.env.port
 
 
 
@@ -14,6 +17,15 @@ app.use(express.json())
 
 app.use(userRoute)
 app.use(taskRoute)
+
+// app.use((error, req, res, next) => {
+//     if(res.headerSent) {
+//         return next(err)
+//     }
+
+//     res.status(error.statusCode || 500)
+//     res.send({error : error.message})
+// })
 
 // app.get('/users',(req,res) => {
 //     User.find({}).then((users) => {
